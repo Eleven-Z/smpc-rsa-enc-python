@@ -34,30 +34,11 @@ class Functions_helper:
         return sympy.Poly.from_list([random.randint(1, 20) for t in range(degree + 1)], gen=sympy.Symbol("x"))
 
     #EDITED
-    # @staticmethod
-    # def poly_generator_without_random_constant(degree, constant):
-    #     coeff = [random.randint(1, 20) for t in range(degree)]
-    #     coeff.append(constant)
-    #     return sympy.Poly.from_list(coeff, gens=sympy.Symbol("x"))
-
-
-    #REMOVE
     @staticmethod
-    def poly_generator_without_random_constant(degree, constant, term):
-        if term == sympy.Symbol("x1"):
-            return sympy.Poly.from_list([2, 1], gens=sympy.Symbol("x"))
-        elif term == sympy.Symbol("x2"):
-            return sympy.Poly.from_list([3, 2], gens=sympy.Symbol("x"))
-        elif term == sympy.Symbol("x3"):
-            return sympy.Poly.from_list([4, 3], gens=sympy.Symbol("x"))
-        elif term == sympy.Symbol("x4"):
-            return sympy.Poly.from_list([5, 4], gens=sympy.Symbol("x"))
-        elif str(term) == "2*x4**5":
-            return sympy.Poly.from_list([1, 2048], gens=sympy.Symbol("x"))
-        elif str(term) == "x2**3":
-            return sympy.Poly.from_list([2, 8], gens=sympy.Symbol("x"))
-
-
+    def poly_generator_without_random_constant(degree, constant):
+        coeff = [random.randint(1, 100) for t in range(degree)]
+        coeff.append(constant)
+        return sympy.Poly.from_list(coeff, gens=sympy.Symbol("x"))
 
 
 
