@@ -43,18 +43,30 @@ class Party:
             for key, value in self.others_shared_x.iteritems():
                 if term in value.keys():
                     return value[term]
-
+    #EDITED
     def share_given_x_among_all(self, all_parties, polynomial_degree,  x):
-        poly = Functions_helper.poly_generator_without_random_constant(polynomial_degree,x)
+        # poly = Functions_helper.poly_generator_without_random_constant(polynomial_degree,x)
+        poly = None
+        if self == all_parties[0]:
+            poly = Poly.from_list([4, x], gens = (Symbol("x")))
+        elif self == all_parties[1]:
+            poly = Poly.from_list([3, x], gens = (Symbol("x")))
+
+        elif self == all_parties[2]:
+            poly = Poly.from_list([2, x], gens = (Symbol("x")))
+
+        elif self == all_parties[3]:
+            poly = Poly.from_list([1, x], gens = (Symbol("x")))
+
         for p in all_parties:
-            p.add_my_share_of_mul_gate(self, self.calculate_x_with_poly(poly, p.get_share_received_from_mul_gate()))
+            p.add_my_share_of_mul_gate(self, self.calculate_x_with_poly(poly, p.get_initial_x()))
 
 
     def generate_my_poly(self,term, degree):
-        self.my_poly[term] = Functions_helper.poly_generator_without_random_constant(degree, self.x[term])
+        self.my_poly[term] = Functions_helper.poly_generator_without_random_constant(degree, self.x[term], term)
 
     def share_my_x_with_myself(self, term):
-        self.my_shared_x[term] = self.calculate_x_with_poly(self.my_poly[term], self.x[term])
+        self.my_shared_x[term] = self.calculate_x_with_poly(self.my_poly[term], self.get_initial_x())
 
     def get_my_x_for_term(self, term):
         return self.x[term]

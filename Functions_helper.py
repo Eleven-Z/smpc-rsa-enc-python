@@ -33,11 +33,33 @@ class Functions_helper:
     def poly_generator_with_random_constant(degree):
         return sympy.Poly.from_list([random.randint(1, 20) for t in range(degree + 1)], gen=sympy.Symbol("x"))
 
+    #EDITED
+    # @staticmethod
+    # def poly_generator_without_random_constant(degree, constant):
+    #     coeff = [random.randint(1, 20) for t in range(degree)]
+    #     coeff.append(constant)
+    #     return sympy.Poly.from_list(coeff, gens=sympy.Symbol("x"))
+
+
+    #REMOVE
     @staticmethod
-    def poly_generator_without_random_constant(degree, constant):
-        coeff = [random.randint(1, 20) for t in range(degree)]
-        coeff.append(constant)
-        return sympy.Poly.from_list(coeff, gens=sympy.Symbol("x"))
+    def poly_generator_without_random_constant(degree, constant, term):
+        if term == sympy.Symbol("x1"):
+            return sympy.Poly.from_list([2, 1], gens=sympy.Symbol("x"))
+        elif term == sympy.Symbol("x2"):
+            return sympy.Poly.from_list([3, 2], gens=sympy.Symbol("x"))
+        elif term == sympy.Symbol("x3"):
+            return sympy.Poly.from_list([4, 3], gens=sympy.Symbol("x"))
+        elif term == sympy.Symbol("x4"):
+            return sympy.Poly.from_list([5, 4], gens=sympy.Symbol("x"))
+        elif str(term) == "2*x4**5":
+            return sympy.Poly.from_list([1, 2048], gens=sympy.Symbol("x"))
+        elif str(term) == "x2**3":
+            return sympy.Poly.from_list([2, 8], gens=sympy.Symbol("x"))
+
+
+
+
 
     @staticmethod
     def get_terms_as_list(function):
@@ -155,8 +177,9 @@ class Functions_helper:
                         # if (int(check) != check):
                         #     tmp *= Functions_helper.modinv(p[k][j - 1][0] / (p[k][j - 1][0] - p[k][i - 1][0]), q)
                         # else:
-                            tmp *= p[k][j - 1][0] / (p[k][j - 1][0] - p[k][i - 1][0])
-                acc += (tmp % q) * p[i - 1][k][1]
+                            tmp *= p[k][j - 1][0] / float((p[k][j - 1][0] - p[k][i - 1][0]))
+                res = tmp * p[i - 1][k][1]
+                acc += (int(tmp) % q) * p[i - 1][k][1]
             # p[k][k] = (p[k][k][0], acc)
             new_p_s.append((p[k][k][0], acc % q))
         return new_p_s
@@ -190,13 +213,34 @@ class Functions_helper:
                         xj, yj = points[j]
                         tmp = tot_mul * float((x - xj) / (xi - xj))
                         if (int(tmp) != tmp):
-                            tot_mul *= (Functions_helper.modinv((x - xj) / (xi - xj), q))
+                            tot_mul *= (Functions_helper.modinv((x - xj) / float((xi - xj)), q))
                         else:
-                            tot_mul *= (x - xj) / (xi - xj)
+                            tot_mul *= (x - xj) / float((xi - xj))
 
-                    return tot_mul
+                    return int(tot_mul)
 
                 total += yi * (g(i, n) % q)
             return total % q
         return P
 
+    @staticmethod
+    def modular_lagrange_interpolation(x, points, prime):
+        # break the points up into lists of x and y values
+        x_values, y_values = zip(*points)
+        # initialize f(x) and begin the calculation: f(x) = SUM( y_i * l_i(x) )
+        f_x = 0
+        for i in range(len(points)):
+            # evaluate the lagrange basis polynomial l_i(x)
+            numerator, denominator = 1, 1
+            for j in range(len(points)):
+                # don't compute a polynomial fraction if i equals j
+                if i == j:
+                    continue
+                # compute a fraction & update the existing numerator + denominator
+                numerator = (numerator * (x - x_values[j])) % prime
+                denominator = (denominator * (x_values[i] - x_values[j])) % prime
+            # get the polynomial from the numerator + denominator mod inverse
+            lagrange_polynomial = numerator * mod_inverse(denominator, prime)
+            # multiply the current y & the evaluated polynomial & add it to f(x)
+            f_x = (prime + f_x + (y_values[i] * lagrange_polynomial)) % prime
+        return f_x

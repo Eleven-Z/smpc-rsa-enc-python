@@ -12,7 +12,8 @@ class Controller:
     def initial_parties(self):
         for i in range(1, self.number_of_p + 1):
             public, private = RSA.generate_keypair(RSA.get_random_prime(), RSA.get_random_prime())
-            p = Party(i, random.randint(1, 50), public, private)
+            # p = Party(i, random.randint(1, 50), public, private)        #EDITED
+            p = Party(i,i, public, private)         #REMOVE
             p.generate_my_poly(p.get_my_symbol(), self.t)
             self.parties.append(p)
 
@@ -95,12 +96,12 @@ class Controller:
 
         self.tell_each_party_to_share_its_mul_value(mul_result)
         table = self.construct_table_for_mul_gate_interpolation()
-        print "table : "
-        for f in table:
-            print f
+        # print "table : "
+        # for f in table:
+        #     print f
 
         interpolate = Functions_helper.interpolation(table)
-        # print interpolate
+        print interpolate
         for i, p in enumerate(Controller.parties):
             p.set_share_received_from_mul_gate(interpolate[i][1])
 
@@ -153,7 +154,9 @@ if __name__ == "__main__":
     controller.initial_parties()
     controller.tell_every_one_to_share_initial_x()
     controller.check_for_local_calculation()
+    print "multiply gate result: "
     controller.perform_multiply_gate()
+
     output = controller.perform_add_gate()
     print "results from the final gate (before interpolation) : "
     print output
@@ -163,5 +166,7 @@ if __name__ == "__main__":
     print "output from interpolation with two points"
     print Functions_helper.output(output[:2])
     print "output from interpolation with 4 points"
-    # print Functions_helper.lagrange_interpolation(output)(0)
+    print Functions_helper.output(output)
+    # print Functions_helper.lagrange_interpolation([output[1]] + [output[3]] )(0)
+    print Functions_helper.modular_lagrange_interpolation(0, output, 6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042159)
     # print interpolate.lagrange([x for _, x in output], [y for y, _ in output])
